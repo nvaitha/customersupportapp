@@ -68,6 +68,20 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Deployment workflow
+
+GitHub `main` is the source of truth:
+
+```bash
+npm run lint
+npm run build
+git add -A
+git commit -m "Describe the change"
+git push
+```
+
+After this repository is imported into Vercel, every push to `main` will trigger a production deployment automatically through Vercel's Git integration. Pull requests and non-production branches get preview deployments.
+
 ## Checks
 
 ```bash
