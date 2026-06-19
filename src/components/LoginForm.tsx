@@ -35,7 +35,11 @@ export function LoginForm() {
     <form onSubmit={handleSubmit} className="flex w-full max-w-xs flex-col gap-3">
       <input
         type="password"
+        name="password"
         autoFocus
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
