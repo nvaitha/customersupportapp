@@ -1,4 +1,5 @@
 import type { Ticket } from "@/lib/supabase/types";
+import { SubmitButton } from "@/components/SubmitButton";
 
 type TicketFormProps = {
   action: (formData: FormData) => void;
@@ -49,12 +50,12 @@ export function TicketForm({ action, initialTicket, submitLabel }: TicketFormPro
         />
       </div>
 
-      <button
-        type="submit"
-        className="self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+      <SubmitButton
+        pendingLabel="Saving..."
+        className="self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600"
       >
         {submitLabel}
-      </button>
+      </SubmitButton>
     </form>
   );
 }

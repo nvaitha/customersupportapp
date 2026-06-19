@@ -1,5 +1,7 @@
 import "server-only";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+let supabaseServerClient: SupabaseClient | null = null;
 
 export function createSupabaseServerClient() {
   const url = process.env.SUPABASE_URL;
@@ -9,7 +11,9 @@ export function createSupabaseServerClient() {
     throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars");
   }
 
-  return createClient(url, serviceRoleKey, {
+  supabaseServerClient ??= createClient(url, serviceRoleKey, {
     auth: { persistSession: false },
   });
+
+  return supabaseServerClient;
 }

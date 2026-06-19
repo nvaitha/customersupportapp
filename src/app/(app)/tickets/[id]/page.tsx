@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TicketForm } from "@/components/TicketForm";
 import { StatusBadge } from "@/components/StatusBadge";
-import { updateTicket, toggleStatus } from "@/lib/actions/tickets";
+import { SubmitButton } from "@/components/SubmitButton";
+import { deleteTicket, updateTicket, toggleStatus } from "@/lib/actions/tickets";
 import type { Ticket } from "@/lib/supabase/types";
 
 export default async function TicketDetailPage({
@@ -25,6 +26,7 @@ export default async function TicketDetailPage({
   const typedTicket = ticket as Ticket;
   const toggleStatusForTicket = toggleStatus.bind(null, typedTicket.id, typedTicket.status);
   const updateTicketForId = updateTicket.bind(null, typedTicket.id);
+  const deleteTicketForId = deleteTicket.bind(null, typedTicket.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,12 +35,20 @@ export default async function TicketDetailPage({
         <div className="flex items-center gap-3">
           <StatusBadge status={typedTicket.status} />
           <form action={toggleStatusForTicket}>
-            <button
-              type="submit"
-              className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            <SubmitButton
+              pendingLabel="Updating..."
+              className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Mark as {typedTicket.status === "active" ? "resolved" : "active"}
-            </button>
+            </SubmitButton>
+          </form>
+          <form action={deleteTicketForId}>
+            <SubmitButton
+              pendingLabel="Deleting..."
+              className="rounded-md border border-red-200 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Delete
+            </SubmitButton>
           </form>
         </div>
       </div>

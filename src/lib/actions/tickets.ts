@@ -52,3 +52,17 @@ export async function toggleStatus(id: string, currentStatus: TicketStatus) {
   revalidatePath("/tickets");
   revalidatePath(`/tickets/${id}`);
 }
+
+export async function deleteTicket(id: string, formData?: FormData) {
+  const supabase = createSupabaseServerClient();
+  const { error } = await supabase.from("tickets").delete().eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  const redirectTo = formData?.get("redirect_to");
+  const nextPath =
+    typeof redirectTo === "string" && redirectTo.startsWith("/tickets") ? redirectTo : "/tickets";
+
+  revalidatePath("/tickets");
+  redirect(nextPath);
+}

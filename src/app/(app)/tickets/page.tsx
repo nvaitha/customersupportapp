@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { StatusBadge } from "@/components/StatusBadge";
 import { StatusFilterTabs } from "@/components/StatusFilterTabs";
+import { TicketListItem } from "@/components/TicketListItem";
 import type { Ticket, TicketStatus } from "@/lib/supabase/types";
 
 export default async function TicketsPage({
@@ -37,20 +37,7 @@ export default async function TicketsPage({
       ) : (
         <ul className="flex flex-col divide-y divide-neutral-200 rounded-lg border border-neutral-200">
           {(tickets as Ticket[]).map((ticket) => (
-            <li key={ticket.id}>
-              <Link
-                href={`/tickets/${ticket.id}`}
-                className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-neutral-50"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-neutral-900">{ticket.title}</span>
-                  {ticket.order_ref && (
-                    <span className="text-xs text-neutral-500">Order {ticket.order_ref}</span>
-                  )}
-                </div>
-                <StatusBadge status={ticket.status} />
-              </Link>
-            </li>
+            <TicketListItem key={ticket.id} ticket={ticket} currentStatus={status} />
           ))}
         </ul>
       )}
