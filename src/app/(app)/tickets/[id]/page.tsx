@@ -31,13 +31,6 @@ export default async function TicketDetailPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <Link
-        href="/tickets"
-        className="self-start rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-      >
-        Back to dashboard
-      </Link>
-
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-medium text-neutral-900">{typedTicket.title}</h1>
         <div className="flex items-center gap-3">
@@ -61,7 +54,19 @@ export default async function TicketDetailPage({
         </div>
       </div>
 
-      <TicketForm action={updateTicketForId} initialTicket={typedTicket} submitLabel="Save changes" />
+      <TicketForm
+        action={updateTicketForId}
+        initialTicket={typedTicket}
+        secondaryAction={
+          <Link
+            href="/tickets"
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          >
+            Back to dashboard
+          </Link>
+        }
+        submitLabel="Save changes"
+      />
     </div>
   );
 }

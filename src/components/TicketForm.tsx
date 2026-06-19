@@ -4,10 +4,11 @@ import { SubmitButton } from "@/components/SubmitButton";
 type TicketFormProps = {
   action: (formData: FormData) => void;
   initialTicket?: Ticket;
+  secondaryAction?: React.ReactNode;
   submitLabel: string;
 };
 
-export function TicketForm({ action, initialTicket, submitLabel }: TicketFormProps) {
+export function TicketForm({ action, initialTicket, secondaryAction, submitLabel }: TicketFormProps) {
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
@@ -50,12 +51,15 @@ export function TicketForm({ action, initialTicket, submitLabel }: TicketFormPro
         />
       </div>
 
-      <SubmitButton
-        pendingLabel="Saving..."
-        className="self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600"
-      >
-        {submitLabel}
-      </SubmitButton>
+      <div className="flex flex-wrap items-center gap-3">
+        <SubmitButton
+          pendingLabel="Saving..."
+          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600"
+        >
+          {submitLabel}
+        </SubmitButton>
+        {secondaryAction}
+      </div>
     </form>
   );
 }
