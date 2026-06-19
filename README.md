@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Customer Support App
 
-## Getting Started
+A small internal support-ticket tracker for Shopify-adjacent customer issues. It lets you:
 
-First, run the development server:
+- create a ticket with a title, Shopify order reference, and issue description
+- view all tickets or filter by `active` / `resolved`
+- edit ticket details
+- toggle a ticket between active and resolved
+- protect the app behind a simple password session
+
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS 4
+- Supabase, using a server-side service-role client
+
+## Environment
+
+Create `.env.local` with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+APP_PASSWORD=...
+SESSION_SECRET=...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`SESSION_SECRET` should be a long random string. `APP_PASSWORD` is the password used on `/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `tickets` table in Supabase:
 
-## Learn More
+```sql
+create table tickets (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text not null default '',
+  order_ref text,
+  status text not null default 'active' check (status in ('active', 'resolved')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
-To learn more about Next.js, take a look at the following resources:
+create or replace function set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+create trigger tickets_set_updated_at
+before update on tickets
+for each row
+execute function set_updated_at();
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Because the app uses `SUPABASE_SERVICE_ROLE_KEY`, keep all ticket reads and writes on the server.
 
-## Deploy on Vercel
+## Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm install
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open `http://localhost:3000`.
+
+## Checks
+
+```bash
+npm run lint
+npm run build
+```
