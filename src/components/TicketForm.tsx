@@ -51,6 +51,20 @@ export function TicketForm({ action, initialTicket, secondaryAction, submitLabel
         />
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="manager_comments" className="text-sm font-medium text-neutral-900">
+          Cathy&apos;s comments
+        </label>
+        <textarea
+          id="manager_comments"
+          name="manager_comments"
+          defaultValue={initialTicket?.manager_comments ?? ""}
+          rows={4}
+          placeholder="Private notes, reminders, or follow-up context"
+          className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-950 outline-none placeholder:text-neutral-400 focus:border-neutral-700"
+        />
+      </div>
+
       <div className="flex flex-wrap items-center gap-3">
         <SubmitButton
           pendingLabel="Saving..."

@@ -5,18 +5,36 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { TicketStatus } from "@/lib/supabase/types";
 
+function isMissingManagerCommentsColumn(error: { message?: string; code?: string }) {
+  return error.code === "PGRST204" || error.message?.includes("manager_comments");
+}
+
 export async function createTicket(formData: FormData) {
   const title = (formData.get("title") as string)?.trim() || "Untitled ticket";
   const description = (formData.get("description") as string)?.trim() || "";
+  const managerComments = (formData.get("manager_comments") as string)?.trim() || "";
   const orderRef = (formData.get("order_ref") as string)?.trim() || null;
 
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+  const ticketPayload = {
+    title,
+    description,
+    manager_comments: managerComments,
+    order_ref: orderRef,
+  };
+
+  let result = await supabase
     .from("tickets")
-    .insert({ title, description, order_ref: orderRef })
+    .insert(ticketPayload)
     .select("id")
     .single();
 
+  if (result.error && isMissingManagerCommentsColumn(result.error)) {
+    const fallbackPayload = { title, description, order_ref: orderRef };
+    result = await supabase.from("tickets").insert(fallbackPayload).select("id").single();
+  }
+
+  const { data, error } = result;
   if (error) throw new Error(error.message);
 
   revalidatePath("/tickets");
@@ -26,14 +44,28 @@ export async function createTicket(formData: FormData) {
 export async function updateTicket(id: string, formData: FormData) {
   const title = (formData.get("title") as string)?.trim() || "Untitled ticket";
   const description = (formData.get("description") as string)?.trim() || "";
+  const managerComments = (formData.get("manager_comments") as string)?.trim() || "";
   const orderRef = (formData.get("order_ref") as string)?.trim() || null;
 
   const supabase = createSupabaseServerClient();
-  const { error } = await supabase
+  const ticketPayload = {
+    title,
+    description,
+    manager_comments: managerComments,
+    order_ref: orderRef,
+  };
+
+  let result = await supabase
     .from("tickets")
-    .update({ title, description, order_ref: orderRef })
+    .update(ticketPayload)
     .eq("id", id);
 
+  if (result.error && isMissingManagerCommentsColumn(result.error)) {
+    const fallbackPayload = { title, description, order_ref: orderRef };
+    result = await supabase.from("tickets").update(fallbackPayload).eq("id", id);
+  }
+
+  const { error } = result;
   if (error) throw new Error(error.message);
 
   revalidatePath("/tickets");

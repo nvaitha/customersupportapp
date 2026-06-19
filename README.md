@@ -37,6 +37,7 @@ create table tickets (
   id uuid primary key default gen_random_uuid(),
   title text not null,
   description text not null default '',
+  manager_comments text not null default '',
   order_ref text,
   status text not null default 'active' check (status in ('active', 'resolved')),
   created_at timestamptz not null default now(),
@@ -55,6 +56,13 @@ create trigger tickets_set_updated_at
 before update on tickets
 for each row
 execute function set_updated_at();
+```
+
+If your table already exists, add Cathy's comments with:
+
+```sql
+alter table tickets
+add column if not exists manager_comments text not null default '';
 ```
 
 Because the app uses `SUPABASE_SERVICE_ROLE_KEY`, keep all ticket reads and writes on the server.
